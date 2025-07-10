@@ -5,25 +5,29 @@ let camX = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  player = new Player(100, 300, 15);
+  player = new Player(100, 3*windowWidth/4, 15);
 
   platforms.push(new Platform(-320, height - 40, 520, 40, 0));
-  platforms.push(new Platform(300, height - 150, 40, 40, 0));
-  platforms.push(new Platform(600, height - 290, 120, 60, 0));
+  platforms.push(new Platform(300, height - 150, 120, 40, 0));
+  platforms.push(new Platform(600, height - 290, 120, 40, 0));
   platforms.push(new Platform(1000, height - 200, 200, 40, 0));
   platforms.push(new Platform(1400, height - 300, 200, 2000, 0));
   platforms.push(new Platform(1590, height - 50, 660, 50, 0));
   platforms.push(new Platform(1810, height - 460, 200, 200, 0));
   platforms.push(new Platform(2249, height - 201, 200, 2000, 0));
-
+  platforms.push(new Platform(2100, height - 600, 120, 40, 0));
+  platforms.push(new Platform(1800, height - 750, 120, 40, 0));
+  
   spikes.push(new Spike(2000, height - 50, 50));
   spikes.push(new Spike(690, height - 290, 30));
+  spikes.push(new Spike(2300, height - 200, 50));
+  spikes.push(new Spike(1100, height - 200, 50));
 }
 
 function draw() {
   player.vel.x *= 0.9;
   noStroke();
-  background(230, 255, 255);
+  background(144);
   translate(-camX, 0);
 
   player.update();
@@ -50,7 +54,6 @@ function draw() {
 
 class Player {
   constructor(x, y, r) {
-    this.spawn = createVector(x, y);
     this.pos = createVector(x, y);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0.65);
@@ -58,29 +61,35 @@ class Player {
     this.h = 40;
     this.r = r;
     this.onGround = false;
+    this.onWall = false;
+    this.wallDir = 0; // -1 left, 1 right
   }
-
   reset() {
-    this.pos.set(this.spawn);
-    this.vel.set(0, 0);
+    this.pos.x = 100;
+    this.pos.y = 3*windowWidth/4;
+    
   }
-
   update() {
     if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) this.vel.x += 1;
-    if (keyIsDown(LEFT_ARROW)  || keyIsDown(65)) this.vel.x -= 1;
+    if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) this.vel.x -= 1;
 
     this.vel.add(this.acc);
     this.pos.add(this.vel);
+
     this.onGround = false;
+    this.onWall = false;
 
     if (this.pos.y > height) {
-      player.reset();
+      this.reset();
     }
   }
 
   jump() {
     if (this.onGround) {
       this.vel.y = -15;
+    } else if (this.onWall) {
+      this.vel.y = -12;
+      this.vel.x = this.wallDir * 12; // push away
     }
   }
 
@@ -89,7 +98,6 @@ class Player {
     rect(this.pos.x, this.pos.y, this.w, this.h, this.r);
   }
 }
-
 
 class Platform {
   constructor(x, y, w, h, r) {
@@ -105,16 +113,19 @@ class Platform {
   }
 
   checkCollision(player) {
+    // aabb collision
     if (player.pos.x < this.pos.x + this.w &&
         player.pos.x + player.w > this.pos.x &&
         player.pos.y < this.pos.y + this.h &&
         player.pos.y + player.h > this.pos.y) {
           
+      // centre points
       let p_centerX = player.pos.x + player.w / 2;
       let plat_centerX = this.pos.x + this.w / 2;
       let p_centerY = player.pos.y + player.h / 2;
       let plat_centerY = this.pos.y + this.h / 2;
 
+      // centre point difference
       let diffX = p_centerX - plat_centerX;
       let diffY = p_centerY - plat_centerY;
 
@@ -129,8 +140,8 @@ class Platform {
 
       if (penetrationX < penetrationY) {
         player.onWall = true;
-        if (player.vel.y > 0.75) {
-            player.vel.y = 0.75;
+        if (player.vel.y > 1) {
+            player.vel.y = 1;
         }
 
         if (diffX > 0) {
@@ -156,7 +167,6 @@ class Platform {
   }
 }
 
-
 class Spike {
   constructor(x, baseY, size) {
     this.x = x;
@@ -171,7 +181,7 @@ class Spike {
   }
 
   show() {
-    fill(0);
+    fill(20);
     noStroke();
     triangle(
       this.verts[0].x, this.verts[0].y,
@@ -214,8 +224,4 @@ class Spike {
 
     return (u >= 0) && (v >= 0) && (u + v < 1);
   }
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
 }
