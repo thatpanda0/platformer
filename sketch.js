@@ -5,7 +5,7 @@ let camX = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  player = new Player(100, 3*windowWidth/4, 15);
+  player = new Player(100, 3*windowHeight/4, 15);
 
   platforms.push(new Platform(-320, height - 40, 520, 40, 0));
   platforms.push(new Platform(300, height - 150, 120, 40, 0));
@@ -66,7 +66,7 @@ class Player {
   }
   reset() {
     this.pos.x = 100;
-    this.pos.y = 3*windowWidth/4;
+    this.pos.y = 3*windowHeight/4;
     
   }
   update() {
@@ -224,4 +224,9 @@ class Spike {
 
     return (u >= 0) && (v >= 0) && (u + v < 1);
   }
+}
+
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
