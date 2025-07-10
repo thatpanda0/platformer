@@ -215,3 +215,7 @@ class Spike {
     return (u >= 0) && (v >= 0) && (u + v < 1);
   }
 }
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
