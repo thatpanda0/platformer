@@ -27,7 +27,7 @@ function setup() {
 function draw() {
   player.vel.x *= 0.9;
   noStroke();
-  background(144);
+  background(244);
   translate(-camX, 0);
 
   player.update();
