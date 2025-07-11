@@ -47,7 +47,7 @@ function draw() {
     player.jump();
   }
 
-  camX = player.pos.x - 400;
+  camX = player.pos.x - windoWidth/2;
   camX = constrain(camX, 0, 6000 - width);
 }
 
